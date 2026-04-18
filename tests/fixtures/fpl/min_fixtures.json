@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1001,
+    "event": 1,
+    "team_h": 1,
+    "team_a": 2,
+    "kickoff_time": "2024-08-17T12:30:00Z",
+    "finished": true,
+    "minutes": 90,
+    "team_h_difficulty": 3,
+    "team_a_difficulty": 3,
+    "team_h_score": 2,
+    "team_a_score": 1
+  },
+  {
+    "id": 1002,
+    "event": 2,
+    "team_h": 2,
+    "team_a": 1,
+    "kickoff_time": "2024-08-24T12:30:00Z",
+    "finished": true,
+    "minutes": 90,
+    "team_h_difficulty": 3,
+    "team_a_difficulty": 3,
+    "team_h_score": 1,
+    "team_a_score": 1
+  },
+  {
+    "id": 1003,
+    "event": 3,
+    "team_h": 1,
+    "team_a": 2,
+    "kickoff_time": "2024-08-31T12:30:00Z",
+    "finished": false,
+    "minutes": null,
+    "team_h_difficulty": 2,
+    "team_a_difficulty": 4,
+    "team_h_score": null,
+    "team_a_score": null
+  }
+]

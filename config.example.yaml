@@ -1,0 +1,13 @@
+# Copy to config.yaml (gitignored). Only keys listed here are read today; add more when phases land.
+
+paths:
+  fpl_cache: cache/fpl
+  silver: data/silver
+  my_team: cache/my_team.json
+
+fpl:
+  entry_id: null
+
+model:
+  # Last N FPL gameweeks (event ids) with scores in silver. 0 or null = all finished GWs.
+  strength_window_gw: 0

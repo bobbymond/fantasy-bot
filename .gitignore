@@ -1,0 +1,52 @@
+.cache/
+# Secrets / machine-local env (keep a committed `.env.example` if you add one)
+.env
+.env.local
+.envrc
+
+.idea/
+
+.mypy_cache/
+.dmypy.json
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.egg-info/
+*.egg
+*.pyc
+*.pyo
+*.swp
+*.swo
+*~
+
+# Packaging / build
+dist/
+build/
+
+# Coverage (e.g. pytest-cov)
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+.DS_Store
+Thumbs.db
+
+# Local caches and generated trees (keep .gitkeep for empty dirs)
+cache/*
+!cache/.gitkeep
+data/*
+!data/.gitkeep
+!data/artifacts/
+data/artifacts/*
+!data/artifacts/.gitkeep
+!data/silver/
+data/silver/*
+!data/silver/.gitkeep
+
+config.yaml
+my_team.json
