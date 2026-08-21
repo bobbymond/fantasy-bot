@@ -35,12 +35,20 @@ class ModelParams:
 
 
 @dataclass(frozen=True)
+class ApiConfig:
+    """External API configuration."""
+    
+    football_data_api_key: str | None = None
+
+
+@dataclass(frozen=True)
 class AppConfig:
     """Paths plus FPL Classic options from ``config.yaml``."""
 
     paths: Paths
     fpl_entry_id: int | None
     model: ModelParams
+    apis: ApiConfig
 
 
 def _read_config_dict(config_path: Path | None) -> dict[str, Any]:
@@ -76,6 +84,23 @@ def _load_model_params(data: dict[str, Any]) -> ModelParams:
     )
 
 
+def _load_api_config(data: dict[str, Any]) -> ApiConfig:
+    """Load API configuration."""
+    apis_raw = data.get("apis") or {}
+    if not isinstance(apis_raw, dict):
+        apis_raw = {}
+    
+    football_data_raw = apis_raw.get("football_data") or {}
+    if not isinstance(football_data_raw, dict):
+        football_data_raw = {}
+    
+    football_data_api_key = football_data_raw.get("api_key")
+    
+    return ApiConfig(
+        football_data_api_key=football_data_api_key
+    )
+
+
 def load_app_config(*, config_path: Path | None = None) -> AppConfig:
     """Paths + ``fpl.entry_id`` (may be ``None``) + ``model`` params."""
     data = _read_config_dict(config_path)
@@ -102,6 +127,7 @@ def load_app_config(*, config_path: Path | None = None) -> AppConfig:
         paths=paths,
         fpl_entry_id=fpl_entry_id,
         model=_load_model_params(data),
+        apis=_load_api_config(data)
     )
 
 

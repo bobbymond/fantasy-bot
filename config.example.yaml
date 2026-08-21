@@ -11,3 +11,12 @@ fpl:
 model:
   # Last N FPL gameweeks (event ids) with scores in silver. 0 or null = all finished GWs.
   strength_window_gw: 0
+  # Prior season configuration
+  prior_season_weight: 0.7
+  prior_transition_gw: 6
+  promoted_club_degradation: 0.15
+
+# External API keys
+apis:
+  football_data:
+    api_key: null  # Get from https://www.football-data.org/
