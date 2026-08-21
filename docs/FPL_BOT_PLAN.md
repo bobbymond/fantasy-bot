@@ -206,10 +206,3 @@ Job **`finalize-gw <gw>`** (after official scores available): fill **actual** pl
 
 - **Betting odds:** legal/stable ingestion, vig removal, mapping to λ or full scoreline law
 - **Rich card/OG models** — only if needed
-
----
-
-## 9. Cursor usage
-
-- **Canonical spec:** `docs/FPL_BOT_PLAN.md` — use **`@docs/FPL_BOT_PLAN.md`** (or `@FPL_BOT_PLAN.md`) in Cursor chat for full context.
-- **Project rule:** `.cursor/rules/fpl-bot.mdc` — non-negotiables (modularity, advisory-only, evaluation inputs/outputs). **`alwaysApply: true`** so every conversation in this repo loads it.

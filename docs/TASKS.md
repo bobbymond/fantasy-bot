@@ -16,7 +16,7 @@ Use this as a **checkbox backlog**. Order matters early on (Phase 0 → 1 → 2)
 
 **Rule of thumb:** *Plan = contracts and phases. Tasks = granular work.* One source of truth for **decisions** (the plan); the task list is allowed to be **more detailed and messier** than §7 as long as it does not **contradict** the plan.
 
-**When working with Cursor:** In chat, say things like *“Implement X; update TASKS checkboxes; if this changes a project decision, update FPL_BOT_PLAN too.”* If you only touch code, at least tick **`TASKS.md`** in the same PR so the paper trail matches reality.
+**When working with AI agents:** In chat, say things like *“Implement X; update TASKS checkboxes; if this changes a project decision, update FPL_BOT_PLAN too.”* If you only touch code, at least tick **`TASKS.md`** in the same PR so the paper trail matches reality.
 
 **Low ceremony option:** After any meaningful change, one line in git commit body: `Docs: plan` / `Docs: tasks` / `Docs: plan+tasks` so you can see when both moved.
 
@@ -24,7 +24,7 @@ Use this as a **checkbox backlog**. Order matters early on (Phase 0 → 1 → 2)
 
 ## Before code
 
-- [x] Open this folder as the Cursor project root (`fantasy-bot`)
+- [x] Open this folder as the project root (`fantasy-bot`)
 - [x] `git init` (if not already a repo); add `.gitignore` for `cache/`, `data/`, `.env`, root `my_team.json` (legacy `paths.my_team` override), `__pycache__/`, `.venv/` (default squad snapshot lives under `cache/` → covered by `cache/*`)
 - [ ] Skim `FPL_BOT_PLAN.md` once so the architecture words stop sounding like cult jargon
 
@@ -201,8 +201,57 @@ Use this as a **checkbox backlog**. Order matters early on (Phase 0 → 1 → 2)
 - [ ] Phase 9 — chips
 - [ ] Phase 10 — cron, polish
 
----
 
-## Optional Cursor habit
 
-Use **Cursor Todo** (or GitHub Issues) for **the current phase only** (3–5 items “in flight”); keep this file as the **long** checklist so the agent does not pretend your 40-step roadmap is due by tea time.
+## Implementation Plan: Previous-Season Team Priors & Promoted Clubs
+
+### Previous-Season Team Priors Implementation
+
+**Data Acquisition:**
+- [ ] Create `ingest/prior_season.py` module
+- [ ] Implement historical data fetching from FPL archive/external API
+- [ ] Add end-of-season snapshot functionality
+
+**Storage Strategy:**
+- [ ] Add new silver table: `season_priors.parquet`
+- [ ] Schema: `season`, `team_id`, `home_attack`, `away_attack`, `home_defence`, `away_defence`
+- [ ] Bump `SILVER_SCHEMA_VERSION` when adding new table
+
+**Team Strength Integration:**
+- [ ] Update `team_strength.py` to load prior season data
+- [ ] Implement Bayesian blending: `blend_rates(priors, current, gw)`
+- [ ] Add configuration: `prior_season_weight`, `prior_transition_gw`
+
+### Promoted Clubs Implementation
+
+**Identification Mechanism:**
+- [ ] Create `models/promoted.py` module
+- [ ] Implement `identify_promoted_clubs(current_season)`
+- [ ] Cross-reference current teams with previous season standings
+- [ ] Add external API fallback (football-data.org)
+
+**Special Priors Handling:**
+- [ ] Add `is_promoted` flag to team model
+- [ ] Implement `apply_promoted_prior(team_id)`
+- [ ] Use league average with 15% degradation for promoted clubs
+- [ ] Gradual transition to actual performance data
+
+**Configuration:**
+- [ ] Add to `config.yaml`:
+  ```yaml
+  model:
+    prior_season_weight: 0.7
+    prior_transition_gw: 6
+    promoted_club_degradation: 0.15
+  ```
+
+### Implementation Sequence
+1. Historical data pipeline (`ingest/prior_season.py`)
+2. Promoted club identification (`models/promoted.py`)
+3. Team strength integration (`team_strength.py`)
+4. CLI extension: `fplbot model team-strength --gw 1 --show-priors`
+
+### External Dependencies
+- [ ] Research football-data.org API integration
+- [ ] Implement rate limiting and error handling
+- [ ] Add configuration for external API keys

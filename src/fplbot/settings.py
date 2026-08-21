@@ -27,6 +27,11 @@ class ModelParams:
 
     # Last N FPL gameweek ids with results in silver (0 = all finished GWs in silver).
     strength_window_gw: int = 0
+    
+    # Prior season configuration
+    prior_season_weight: float = 0.7  # Initial weight for prior season data
+    prior_transition_gw: int = 6      # GW where prior influence drops to zero
+    promoted_club_degradation: float = 0.15  # Performance degradation for promoted clubs
 
 
 @dataclass(frozen=True)
@@ -57,8 +62,17 @@ def _load_model_params(data: dict[str, Any]) -> ModelParams:
         strength_window_gw = 0
     else:
         strength_window_gw = int(sw_raw)
+    
+    # Prior season parameters
+    prior_season_weight = float(raw.get("prior_season_weight", 0.7))
+    prior_transition_gw = int(raw.get("prior_transition_gw", 6))
+    promoted_club_degradation = float(raw.get("promoted_club_degradation", 0.15))
+    
     return ModelParams(
         strength_window_gw=strength_window_gw,
+        prior_season_weight=prior_season_weight,
+        prior_transition_gw=prior_transition_gw,
+        promoted_club_degradation=promoted_club_degradation,
     )
 
 

@@ -82,10 +82,31 @@ Do not commit **`cache/`**, **`data/silver/`** contents, **`.env`**, **`config.y
 
 ---
 
+## Workspace expectations for agents
+
+Before non-trivial work on this project, read **`docs/FPL_BOT_PLAN.md`** (canonical spec). If that path is missing, search for `FPL_BOT_PLAN.md`.
+
+### Non-negotiables
+
+1. **Advisory only** — no auto-submit to the FPL site; session cookies / secrets only in **`ingest.team_snapshot`** + env (see `docs/SYNC_TEAM.md`).
+2. **Modular pipelines** — separate `ingest.fpl`, `ingest.fantasy_scout`, optional future `ingest.*`; silver layer; optimiser has no HTTP.
+3. **Evaluation** — every `suggest` / `record` creates a **`run_id`** with:
+   - **All prediction inputs**: content-addressed raw payloads, `my_team.json`, frozen config, git SHA, **materialised silver / predictor inputs** (not "rebuild from main").
+   - **All useful predictions**: per-player expected points (primary), fixture/team model outputs, recommended 15/XI/captain/transfers and expected totals.
+4. **Post-GW** — `finalize-gw` joins **actuals** for back-analysis.
+
+### Implementation hints
+
+- **Official FPL API only** for ingest: **`httpx`** + owned/partial models in `ingest.fpl`
+- **Silver** materialisation: **Parquet** under `data/silver/`; **SQLite** in **Phase 5b** for `runs` / predictions / actuals (plan §3.4, §5.5).
+- **Chips** and **odds** are **out of v1 optimiser** unless the plan phase says otherwise.
+
+---
+
 ## Further reading
 
 - **`README.md`** — install, CLI examples, auth.
 - **`docs/SYNC_TEAM.md`** — `sync-team` and headers.
-- **`.cursor/rules/fpl-bot.mdc`** — workspace expectations for agents in Cursor.
+- **`.opencode/opencode.json`** — opencode agent configuration for this workspace.
 
 When behaviour or scope changes materially, update **`docs/FPL_BOT_PLAN.md`** and checkbox state in **`docs/TASKS.md`**.
