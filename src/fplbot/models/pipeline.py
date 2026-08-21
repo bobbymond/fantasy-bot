@@ -91,7 +91,7 @@ def _snap_and_rates(
     snap = load_silver(silver_dir)
     gw_id = resolve_target_gw(snap.events, gw_override=gw)
     team_ids = [int(t["id"]) for t in snap.teams]
-    rates = build_team_rates(snap.fixtures, team_ids, model)
+    rates = build_team_rates(snap.fixtures, team_ids, model, silver_dir, gw_id)
     return snap, gw_id, rates
 
 

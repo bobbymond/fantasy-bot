@@ -308,7 +308,7 @@ def run_fixture_detail(
             f"Fixture {fixture_id} is in GW{fx_ev}, not --gw {gw} (omit --gw to allow)"
         )
     team_ids = [int(t["id"]) for t in snap.teams]
-    rates = build_team_rates(snap.fixtures, team_ids, cfg.model)
+    rates = build_team_rates(snap.fixtures, team_ids, cfg.model, cfg.paths.silver, fx_ev)
     team_lookup = {
         int(t["id"]): str(t.get("short_name") or t.get("name") or "?")
         for t in snap.teams
