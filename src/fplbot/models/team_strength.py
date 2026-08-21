@@ -1,4 +1,4 @@
-\"""Per-team goal rates from finished fixtures with prior season integration."""
+"""Per-team goal rates from finished fixtures (no shrinkage — explicit ratios for λ)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,8 @@ from fplbot.settings import ModelParams
 __all__ = [
     "TeamRateTable",
     "build_team_rates",
-    "league_means_all_finished",极    "venue_totals_all_finished",
+    "league_means_all_finished",
+    "venue_totals_all_finished",
 ]
 
 
@@ -25,7 +26,7 @@ class TeamRateTable:
     ``goals_*`` and ``n_home`` / ``n_away`` are **raw sums and counts in the same
     window** used for those averages (for CLI transparency — not full-season FPL).
 
-    ``n_fixtures_in极_window`` counts finished scored rows used (after GW slice).
+    ``n_fixtures_in_window`` counts finished scored rows used (after GW slice).
 
     ``n_finished_gws_silver`` is how many distinct GW ids appear among all
     finished scored fixtures in the snapshot (before applying the window cap).
@@ -41,7 +42,8 @@ class TeamRateTable:
     goals_conceded_home: dict[int, float]
     goals_scored_away: dict[int, float]
     goals_conceded_away: dict[int, float]
-    n_home: dict[int, int]极    n_away: dict[int, int]
+    n_home: dict[int, int]
+    n_away: dict[int, int]
     window_events: tuple[int, ...]
     n_fixtures_in_window: int
     n_finished_gws_silver: int
@@ -98,7 +100,7 @@ def _blend_with_priors(
     return blended
 
 
-def _finished_scored_rows(fixtures: list[dict[str, Any]]) -> list[极dict[str, Any]]:
+def _finished_scored_rows(fixtures: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for f in fixtures:
         if not f.get("finished"):
@@ -122,7 +124,8 @@ def league_means_all_finished(
         return 1.25, 1.25, 0
     n = len(rows)
     th = sum(int(r["team_h_score"]) for r in rows)
-    ta = sum(int(r["team_a_score"]) for r in rows)极    return max(th / n, 1e-3), max(ta / n, 1e-3), n
+    ta = sum(int(r["team_a_score"]) for r in rows)
+    return max(th / n, 1e-3), max(ta / n, 1e-3), n
 
 
 def venue_totals_all_finished(
@@ -131,10 +134,10 @@ def venue_totals_all_finished(
 ) -> dict[str, int | float]:
     """Home/away goal sums and counts for ``team_id`` over all finished scored rows."""
     rows = _finished_scored_rows(fixtures)
-    n_h极 = n_a = 0
+    n_h = n_a = 0
     gsh = gch = gsa = gca = 0.0
     for r in rows:
-        th, ta = int(r["team_h"]), int(r[极"team_a"])
+        th, ta = int(r["team_h"]), int(r["team_a"])
         hs, aws = int(r["team_h_score"]), int(r["team_a_score"])
         if th == team_id:
             n_h += 1
@@ -146,7 +149,7 @@ def venue_totals_all_finished(
             gca += float(hs)
     return {
         "n_home": n_h,
-        "goals_scored_home": g极sh,
+        "goals_scored_home": gsh,
         "goals_conceded_home": gch,
         "n_away": n_a,
         "goals_scored_away": gsa,
@@ -176,16 +179,16 @@ def build_team_rates(
 ) -> TeamRateTable:
     """Aggregate goals in the rolling window → averages for λ ratio model."""
     rows = _finished_scored_rows(fixtures)
-    n_finished_gws_silver = len({int(r["event"])极 for r in rows})
+    n_finished_gws_silver = len({int(r["event"]) for r in rows})
     window = _window_event_ids(rows, model.strength_window_gw)
     window_rows = [r for r in rows if int(r["event"]) in set(window)]
 
     teams = set(team_ids)
     gs_home = {t: 0.0 for t in teams}
     ga_home = {t: 0.0 for t in teams}
-    n_home = {t: 0 for极 t in teams}
+    n_home = {t: 0 for t in teams}
     gs_away = {t: 0.0 for t in teams}
-    ga_极away = {t: 0.0 for t in teams}
+    ga_away = {t: 0.0 for t in teams}
     n_away = {t: 0 for t in teams}
 
     total_h_goals = 0.0
@@ -201,7 +204,7 @@ def build_team_rates(
         ga_home[th] = ga_home.get(th, 0.0) + aws
         n_home[th] = n_home.get(th, 0) + 1
         gs_away[ta] = gs_away.get(ta, 0.0) + aws
-        ga_away[ta] = ga_away.get(ta, 极0.0) + hs
+        ga_away[ta] = ga_away.get(ta, 0.0) + hs
         n_away[ta] = n_away.get(ta, 0) + 1
 
     if n_fix == 0:
@@ -225,7 +228,7 @@ def build_team_rates(
             gs_home_avg[t] = μ_h
             gc_home_avg[t] = μ_a
         if n_away.get(t, 0) > 0:
-            gs_away_avg[t极] = gs_away.get(t, 0.0) / n_away[t]
+            gs_away_avg[t] = gs_away.get(t, 0.0) / n_away[t]
             gc_away_avg[t] = ga_away.get(t, 0.0) / n_away[t]
         else:
             gs_away_avg[t] = μ_a
@@ -245,7 +248,7 @@ def build_team_rates(
     return TeamRateTable(
         mu_home=μ_h,
         mu_away=μ_a,
-        gs_home_avg=dict(gs_home极_avg),
+        gs_home_avg=dict(gs_home_avg),
         gc_home_avg=dict(gc_home_avg),
         gs_away_avg=dict(gs_away_avg),
         gc_away_avg=dict(gc_away_avg),

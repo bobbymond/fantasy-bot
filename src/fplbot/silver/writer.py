@@ -11,7 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from fplbot.ingest.models import Bootstrap, Fixture
-from fplbot.ingest.prior_season import SeasonPrior
+
 
 SILVER_SCHEMA_VERSION = 5
 
@@ -54,7 +54,7 @@ def write_silver(
 
 def write_season_priors(
     silver_dir: Path,
-    priors: list[SeasonPrior],
+    priors: list[dict[str, Any]],
     *,
     season: int,
     ingested_at: str | None = None,
@@ -63,21 +63,7 @@ def write_season_priors(
     silver_dir.mkdir(parents=True, exist_ok=True)
     stamp = ingested_at or datetime.now(UTC).replace(microsecond=0).isoformat()
 
-    priors_rows = [
-        {
-            "season": prior.season,
-            "team_id": prior.team_id,
-            "team_name": prior.team_name,
-            "home_attack": prior.home_attack,
-            "away_attack": prior.away_attack,
-            "home_defence": prior.home_defence,
-            "away_defence": prior.away_defence,
-            "matches_played": prior.matches_played,
-        }
-        for prior in priors
-    ]
-    
-    _write_parquet(silver_dir / "season_priors.parquet", priors_rows)
+    _write_parquet(silver_dir / "season_priors.parquet", priors)
     
     # Update metadata to include season priors info
     meta_path = silver_dir / "metadata.json"
